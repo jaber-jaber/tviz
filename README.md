@@ -4,6 +4,8 @@
 CLI command is `tviz`; Rust handles terminal rendering, and a Python probe
 handles custom PyTorch model introspection.
 
+![sample](assets/tviz_example.png)
+
 ## Current MVP
 
 This repo currently includes:
