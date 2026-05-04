@@ -1,0 +1,56 @@
+digraph tviz {
+  graph [rankdir=TB, bgcolor="#0b1020", pad="0.4", nodesep="0.6", ranksep="0.8"];
+  node [shape=box, style="rounded,filled", fontname="Inter", fontsize=10, color="#7dd3fc", fontcolor="#e5edff", fillcolor="#172033"];
+  edge [color="#8aa3b6", arrowsize=0.7, fontcolor="#9fb3c8", fontname="Inter", fontsize=9];
+  subgraph cluster_n_modalities {
+    label="Parallel modality paths";
+    color="#facc15";
+    n_image_input;
+    n_text_input;
+    n_vision_encoder;
+    n_text_embeddings;
+  }
+  subgraph cluster_n_decoder {
+    label="Decoder cycle x5";
+    color="#facc15";
+    n_decoder_cycle;
+    n_rms_1;
+    n_text_attention;
+    n_add_1;
+    n_rms_2;
+    n_mlp;
+    n_add_2;
+  }
+  n_image_input [label="Image input\\nInput", fillcolor="#164e63"];
+  n_text_input [label="Text input\\nInput", fillcolor="#164e63"];
+  n_vision_encoder [label="VisionEncoder\\nViT", fillcolor="#065f46"];
+  n_vision_projection [label="Vision projection\\nLinear", fillcolor="#7c2d12"];
+  n_text_embeddings [label="Text embeddings\\nEmbedding", fillcolor="#3730a3"];
+  n_masked_scatter [label="masked_scatter\\nJoin", fillcolor="#172033"];
+  n_rotary [label="Rotary embedding\\nRoPE", fillcolor="#3730a3"];
+  n_decoder_cycle [label="DecoderLayer (sliding attention)\\nModule", fillcolor="#166534"];
+  n_rms_1 [label="GemmaRMSNorm\\nRMSNorm", fillcolor="#334155"];
+  n_text_attention [label="TextAttention\\nAttention", fillcolor="#166534"];
+  n_add_1 [label="Add\\nResidualAdd", fillcolor="#172033"];
+  n_rms_2 [label="GemmaRMSNorm\\nRMSNorm", fillcolor="#334155"];
+  n_mlp [label="GemmaTextMLP\\nMLP", fillcolor="#7c2d12"];
+  n_add_2 [label="Add\\nResidualAdd", fillcolor="#172033"];
+  n_lm_head [label="LM Head\\nLinear", fillcolor="#14532d"];
+  n_image_input -> n_vision_encoder [label="data", color="#8aa3b6"];
+  n_vision_encoder -> n_vision_projection [label="data", color="#8aa3b6"];
+  n_text_input -> n_text_embeddings [label="data", color="#8aa3b6"];
+  n_vision_projection -> n_masked_scatter [label="join", color="#a78bfa"];
+  n_text_embeddings -> n_masked_scatter [label="join", color="#a78bfa"];
+  n_masked_scatter -> n_rotary [label="data", color="#8aa3b6"];
+  n_rotary -> n_decoder_cycle [label="data", color="#8aa3b6"];
+  n_rotary -> n_text_attention [label="branch", color="#f472b6"];
+  n_decoder_cycle -> n_rms_1 [label="data", color="#8aa3b6"];
+  n_rms_1 -> n_text_attention [label="data", color="#8aa3b6"];
+  n_decoder_cycle -> n_add_1 [label="skip", color="#c084fc"];
+  n_text_attention -> n_add_1 [label="data", color="#8aa3b6"];
+  n_add_1 -> n_rms_2 [label="data", color="#8aa3b6"];
+  n_rms_2 -> n_mlp [label="data", color="#8aa3b6"];
+  n_add_1 -> n_add_2 [label="skip", color="#c084fc"];
+  n_mlp -> n_add_2 [label="data", color="#8aa3b6"];
+  n_add_2 -> n_lm_head [label="data", color="#8aa3b6"];
+}

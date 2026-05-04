@@ -1,0 +1,13 @@
+[package]
+name = "tviz-cli"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[[bin]]
+name = "tviz"
+path = "src/main.rs"
+
+[dependencies]
+tviz-core = { path = "../tviz-core" }
+
